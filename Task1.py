@@ -50,6 +50,7 @@ def rTypeDecoder(machineCode):
     
     return [dictionary[funct],dictionary[rd] ,dictionary[rs] , dictionary[rt]]
 
+
 def iTypeDecoder(machineCode):
     opcode = machineCode[0:6]
     rs = machineCode[6:11]
@@ -72,9 +73,8 @@ def jTypeDecoder(machineCode):
     return [dictionary[opcode], dictionary[binaryToDecimal(address)]]
 
 
-
 def instructionDecoder(machineCode):
-    clock_cycle += 1
+    # clock_cycle += 1
     if(machineCode[0:6] == '000000'):
         return rTypeDecoder(machineCode)
     
@@ -84,8 +84,13 @@ def instructionDecoder(machineCode):
     else:
         return iTypeDecoder(machineCode)
 
-
-
+labels = {
+    'loop1' : 16,
+    'loop2' : 40,
+    'no_swap' : 112,
+    'end_sort' : 132,
+    'end' : 136    
+}
 
 
 instructions = [
@@ -125,14 +130,36 @@ instructions = [
 "00000000000101100101100000100001"
 ]
 
+
 listOfInstructions = []
+pc = 0;
+
 
 for i in instructions:
     clock_cycle += 1
+    pc += 4
     listOfInstructions.append(instructionDecoder(i))
     
+
+
+def getCodeFromLabel(label):
+    instructions = []
     
-print(listOfInstructions)
+    res = list(labels.keys()).index(label)
+    
+    ind_ll = list(labels)[res]
+    ind_ul = list(labels)[res+1]
+
+
+    for i in range(labels[ind_ll], labels[ind_ul] ,4):
+        instructions.append(listOfInstructions[i//4])
+
+    return instructions
+
+
+print(getCodeFromLabel('loop1'))
+  
+
                                 
     
 
