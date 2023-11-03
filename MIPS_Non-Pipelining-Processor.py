@@ -135,10 +135,23 @@ instructions = [
 ]
 
 
-# Final Array 
-# final_array = ["instruction","rs"]
+# Final Array of Registers
 
-def Execute_Phase(instruction):
+def Jumpinstructions(loop_name, instrDictionary, PC_list):
+    temp_index = 0
+    for i in range(len(PC_list)):
+        if PC_list[i][0] == loop_name:
+            temp_index = i
+            break
+    starting_address = PC_list[temp_index][1][0]
+    # end_address = PC_list[temp_index][1][1]
+    end_address = len(instrDictionary)*4
+    for i in range(starting_address, end_address):
+        instruction = instrDictionary[i]
+        Execute_Phase(instruction, instrDictionary, PC_list)
+
+def Execute_Phase(instruction, instrDictionary, PC_list):
+    PC_address = 0
     if instruction[0] == 'move':
         temp_index = 0
         for i in range(len(Register_Array)):
@@ -171,7 +184,8 @@ def Execute_Phase(instruction):
             if Register_Array[i][0] == instruction[3]:
                 Register_Array[temp_index][1] = Register_Array[temp_index_1][1] - Register_Array[i][1]
                 break
-    elif instruction[0] == 'lw': # inst ,reg, imm, reg
+    elif instruction[0] == 'lw': 
+        # inst ,reg, imm, reg
         temp_index = 0
         for i in range(len(Register_Array)):
             if Register_Array[i][0] == instruction[1]:
@@ -206,6 +220,16 @@ def Execute_Phase(instruction):
                 else:
                     Register_Array[temp_index_1][1] = 0
                 break
+    elif instruction[0] == 'bne':
+        temp_index = 0
+        temp_index_1 = 0
+        for i in range(len(Register_Array)):
+            if Register_Array[i][0] == instruction[1]:
+                temp_index = i
+            if Register_Array[i][0] == instruction[2]:
+                temp_index_1 = i
+        if Register_Array[temp_index][1] != Register_Array[temp_index_1][1]:
+            Jumpinstructions(instruction[3], instrDictionary, PC_list)
     elif instruction[0] == 'beq':
         temp_index = 0
         temp_index_1 = 0
@@ -215,7 +239,17 @@ def Execute_Phase(instruction):
             if Register_Array[i][0] == instruction[2]:
                 temp_index_1 = i
         if Register_Array[temp_index][1] == Register_Array[temp_index_1][1]:
-            PC = PC + int(instruction[3])
+            Jumpinstructions(instruction[3], instrDictionary, PC_list)
+    elif instruction[0] == 'j':
+        Jumpinstructions(instruction[1], instrDictionary, PC_list)
+    else:
+        print("Wrong instruction")
+
+for i in range(len(instructions)):
+    instruction = instructionDecoder(instructions[i])
+    Execute_Phase(instruction, instrDictionary, PC_list)
+
+    
 instruction = [
     'addi','s1','s2',10
 ]
