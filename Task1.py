@@ -24,10 +24,7 @@ dictionary = {
     '000100': 'beq',
     '000101': 'bne',
     '000010': 'j',
-    "28" : 'end_sort',
-    "10" : 'no_swap',
-    "1048605" : 'loop2',
-    '65525': 'loop1',
+ 
 }
 
 def binaryToDecimal(binary):
@@ -36,6 +33,34 @@ def binaryToDecimal(binary):
         decimal = decimal*2 + int(digit)
     return str(decimal)
 
+
+def flip(c): 
+    return '1' if (c == '0') else '0' 
+
+
+def twos_comp(bin): # Function prints the one's and two's complement of binary number bin
+    n = len(bin)
+    ones = ""
+    twos = "" 
+    for i in range(n): # Compute the one's complement by flipping the bits
+        ones += flip(bin[i])
+
+    ones = list(ones.strip("")) 
+    twos = list(ones) # Compute 2's complement by adding 1 to the one's complement
+
+    for i in range(n - 1, -1, -1):  # Start from the rightmost bit and keep flipping the bits until we find a 1 
+        if (ones[i] == '1'):
+            twos[i] = '0'
+
+        else:
+            twos[i] = '1'
+            break
+
+    i -= 1
+    if (i == -1):
+        twos.insert(0, '1')
+
+    return twos # Return the 2's complement
 
 
 def rTypeDecoder(machineCode):
@@ -57,20 +82,20 @@ def iTypeDecoder(machineCode):
     rt = machineCode[11:16]
     immediate = machineCode[16:32]
 
-    try:
-        if(dictionary[opcode] == 'sw' or dictionary[opcode] == 'lw'):
-            return [dictionary[opcode],dictionary[rt], binaryToDecimal(immediate), dictionary[rs]]
-
-        elif(binaryToDecimal(immediate) in dictionary.keys() or opcode in dictionary.keys()):
-            return [dictionary[opcode],dictionary[rs], dictionary[rt], dictionary[binaryToDecimal(immediate)]]
-    except:
+    if(dictionary[opcode] == 'sw' or dictionary[opcode] == 'lw'):
+        return [dictionary[opcode],dictionary[rt], binaryToDecimal(immediate), dictionary[rs]]
+    
+    if(immediate[0] == "0"):
         return [dictionary[opcode],dictionary[rs], dictionary[rt], binaryToDecimal(immediate)]
+    
+    return [dictionary[opcode],dictionary[rs], dictionary[rt], binaryToDecimal(twos_comp(immediate))]
+
 
 def jTypeDecoder(machineCode):
     opcode = machineCode[0:6]
     address = machineCode[6:32]
 
-    return [dictionary[opcode], dictionary[binaryToDecimal(address)]]
+    return [dictionary[opcode], binaryToDecimal(address)]
 
 
 def instructionDecoder(machineCode):
@@ -84,13 +109,6 @@ def instructionDecoder(machineCode):
     else:
         return iTypeDecoder(machineCode)
 
-labels = {
-    'loop1' : 16,
-    'loop2' : 40,
-    'no_swap' : 112,
-    'end_sort' : 132,
-    'end' : 136    
-}
 
 
 instructions = [
@@ -130,34 +148,81 @@ instructions = [
 "00000000000101100101100000100001"
 ]
 
-
 listOfInstructions = []
-pc = 0;
+InstructionHashmap = {} # Key: PC, Value:
+dave_list = []
+pc = 4194380;
 
 
 for i in instructions:
     clock_cycle += 1
-    pc += 4
     listOfInstructions.append(instructionDecoder(i))
+    InstructionHashmap[pc] = instructionDecoder(i)
+    pc += 4
+
+
+def identify_labels(InstructionHashmap):
+    labels = {}
+    loop_count = 0 # for naming the labels
+
+    for i in InstructionHashmap:
+        if(InstructionHashmap[i][0] == 'beq' or InstructionHashmap[i][0] == 'bne'):
+            loop_count += 1
+            pc_key = int(i) + 4 + (4 * int(InstructionHashmap[i][3]))
+            labels[pc_key] = f"loop{loop_count}"
+
+        elif(InstructionHashmap[i][0] == 'j'):
+            loop_count += 1
+            pc_key = int(InstructionHashmap[i][1]) * 4
+            labels[pc_key] = f"loop{loop_count}"
     
+    sorted_labels = dict(sorted(labels.items()))
+    return sorted_labels
+
+label_dict = identify_labels(InstructionHashmap)
 
 
-def getCodeFromLabel(label):
-    instructions = []
-    
-    res = list(labels.keys()).index(label)
-    
-    ind_ll = list(labels)[res]
-    ind_ul = list(labels)[res+1]
+for i in label_dict:
+    temp = [label_dict[i], [i]]
+    dave_list.append(temp)
 
 
-    for i in range(labels[ind_ll], labels[ind_ul] ,4):
-        instructions.append(listOfInstructions[i//4])
-
-    return instructions
+print(dave_list)
 
 
-  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# def getCodeFromLabel(label):
+#     instructions = []
+#     res = list(labels.keys()).index(label)
+#     ind_ll = list(labels)[res]
+#     ind_ul = list(labels)[res+1]
+
+#     for i in range(labels[ind_ll], labels[ind_ul] ,4):
+#         instructions.append(listOfInstructions[i//4])
+
+#     return instructions
+
+
+
 
                                 
     
