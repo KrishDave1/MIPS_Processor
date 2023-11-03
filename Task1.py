@@ -157,7 +157,6 @@ def getCodeFromLabel(label):
     return instructions
 
 
-print(getCodeFromLabel('loop1'))
   
 
                                 

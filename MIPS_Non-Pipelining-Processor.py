@@ -1,3 +1,5 @@
+from Task1 import *
+
 Main_memory = [] # take input 
 
 a = {}
@@ -27,22 +29,23 @@ a.update({'j': '000010'})  # Jump
 
 
 # Initializing registers
-Register_Array = []
+Register_Array = [
+    ['zero', 0],
+    ['at', 0],
+    ['s1', 0],
+    ['s2', 0],
+    ['s3', 0],
+    ['s4', 0],
+    ['s6', 0],
+    ['t1', 0],
+    ['t2', 0],
+    ['t3', 0],
+    ['t4', 0],
+    ['t5', 0],
+    ['t8', 0],
+    ['t9', 0]
+]
 
-Register_Array.append(['zero', 0])
-Register_Array.append(['at', 0])
-Register_Array.append(['s1', 0])
-Register_Array.append(['s2', 0])
-Register_Array.append(['s3', 0])
-Register_Array.append(['s4', 0])
-Register_Array.append(['s6', 0])
-Register_Array.append(['t1', 0])
-Register_Array.append(['t2', 0])
-Register_Array.append(['t3', 0])
-Register_Array.append(['t4', 0])
-Register_Array.append(['t5', 0])
-Register_Array.append(['t8', 0])
-Register_Array.append(['t9', 0])
 
 reversed_a = {}
 
@@ -52,87 +55,6 @@ for key, value in a.items():
     else:
         reversed_a[value] = key
 
-def binaryToDecimal(binary):
-    decimal = 0
-    for digit in binary:
-        decimal = decimal*2 + int(digit)
-    return decimal
-
-
-def rTypeDecoder(machineCode):
-    opcode = machineCode[0:6]
-    rs = machineCode[6:11]
-    rt = machineCode[11:16]
-    rd = machineCode[16:21]
-    shamt = machineCode[21:26]
-    funct = machineCode[26:32]
-    return [opcode, rs, rt, rd, shamt, funct]
-
-def iTypeDecoder(machineCode):
-    opcode = machineCode[0:6]
-    rs = machineCode[6:11]
-    rt = machineCode[11:16]
-    immediate = machineCode[16:32]
-
-    return opcode, rs, rt, immediate
-
-def jTypeDecoder(machineCode):
-    opcode = machineCode[0:6]
-    address = machineCode[6:32]
-
-    return opcode, address
-
-
-def instructionDecoder(machineCode):
-    if(machineCode[0:6] == '000000'):
-        return rTypeDecoder(machineCode)
-    
-    elif(machineCode[0:6] == '000010'):
-        return jTypeDecoder(machineCode)
-    
-    else:
-        return iTypeDecoder(machineCode)
-
-
-
-
-
-instructions = [
-"00000000000000001001000000100001",
-"00000000000010111011000000100001",
-"00000000000010101000100000100001",
-"00000001001100100000100000101010",
-"00010100001000000000000000011100",
-"00100010010100100000000000000001",
-"00000000000101100101100000100001",
-"00000000000100010101000000100001",
-"00000000000000001001100000100001",
-"00000000000000001010000000100001",
-"00100010011100110000000000000001",
-"00000001001100101100000000100010",
-"00000011000100110000100000101010",
-"00010100001000001111111111110101",
-"10001101010011000000000000000000",
-"10001101010011010000000000000100",
-"00000001101011000000100000101010",
-"00010000001000000000000000001010",
-"00000000000011001010000000100001",
-"00000000000011010110000000100001",
-"00000000000101000110100000100001",
-"10101101011011000000000000000000",
-"10101101011011010000000000000100",
-"10101101010011000000000000000000",
-"10101101010011010000000000000100",
-"00100001011010110000000000000100",
-"00100001010010100000000000000100",
-"00001000000100000000000000011101",
-"10101101011011000000000000000000",
-"10101101011011010000000000000100",
-"00100001010010100000000000000100",
-"00100001011010110000000000000100",
-"00001000000100000000000000011101",
-"00000000000101100101100000100001"
-]
 
 
 # Final Array 
@@ -216,13 +138,13 @@ def Execute_Phase(instruction):
                 temp_index_1 = i
         if Register_Array[temp_index][1] == Register_Array[temp_index_1][1]:
             PC = PC + int(instruction[3])
-instruction = [
-    'addi','s1','s2',10
-]
-Execute_Phase(instruction)
-instruction = [
-    'move','s2','s1'
-]
-Execute_Phase(instruction)
+
+
+for i in listOfInstructions:
+
+    if(i[0] == 'j' or i[0] == 'beq' or i[0] == 'bne'):
+        break
+
+    Execute_Phase(i)
 
 print(Register_Array)
