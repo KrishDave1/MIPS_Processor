@@ -171,19 +171,23 @@ for i in instructions:
 def identify_labels(InstructionHashmap):
     labels = {}
     loop_count = 0 # for naming the labels
+    loop_count_2 = 0 # for naming the labels
 
     for i in InstructionHashmap:
+        loop_count_2 += 1
         if(InstructionHashmap[i][0] == 'beq' or InstructionHashmap[i][0] == 'bne'):
             loop_count += 1
             pc_key = int(i) + 4 + (4 * int(InstructionHashmap[i][3]))
             labels[str(pc_key)] = f"loop{loop_count}"
             InstructionHashmap[i][3] = labels[str(pc_key)]
+            listOfInstructions[loop_count_2-1][3] = labels[str(pc_key)] 
 
         elif(InstructionHashmap[i][0] == 'j'):
             loop_count += 1
             pc_key = int(InstructionHashmap[i][1]) * 4
             labels[str(pc_key)] = f"loop{loop_count}"
             InstructionHashmap[i][1] = labels[str(pc_key)]
+            listOfInstructions[loop_count_2-1][1] = labels[str(pc_key)]
     
     sorted_labels = dict(sorted(labels.items()))
     return sorted_labels
