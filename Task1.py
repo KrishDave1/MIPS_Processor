@@ -3,20 +3,49 @@ clock_cycle = 0
 dictionary = {
     '00000': 'zero',
     '00001': 'at',
+    '00010': 'v0',
+    '00011': 'v1',
+    '00100': 'a0',
+    '00101': 'a1',
+    '00110': 'a2',
+    '00111': 'a3',
+    '10000': 's0',
     '10001': 's1',
     '10010': 's2',
     '10011': 's3',
     '10100': 's4',
+    '10101': 's5',
     '10110': 's6',
+    '10111': 's7',
+    '01000': 't0',
     '01001': 't1',
     '01010': 't2',
     '01011': 't3',
     '01100': 't4',
     '01101': 't5',
+    '01110': 't6',
     '11000': 't8',
     '11001': 't9',
+    '01111': 't7',
+    '11010': 'gp',
+    '11011': 'sp',
+    '11100': 'fp',
+    '11101': 'sp',
+    '000000': 'sll',
+    '000010': 'srl',
+    '000011': 'sra',
+    '000100': 'sllv',
+    '000110': 'srlv',
+    '000111': 'srav',
+    '001010': 'slti',
+    '100000': 'add',
+    '100001': 'addu',
+    '100011': 'subu',
+    '100100': 'and',
+    '100101': 'or',
     '100001': 'move', # function
     '001000': 'addi',
+    '001001': 'addiu', 
     '100010': 'sub',  # function
     '100011': 'lw',
     '101011': 'sw',
@@ -24,7 +53,9 @@ dictionary = {
     '000100': 'beq',
     '000101': 'bne',
     '000010': 'j',
- 
+    '000011': 'jal',
+    '11111': 'ra',
+    '011100': 'mul'
 }
 
 def binaryToDecimal(binary):
@@ -70,6 +101,9 @@ def rTypeDecoder(machineCode):
     shamt = machineCode[21:26]
     funct = machineCode[26:32]
 
+    if(funct == '001000'):
+        return ["jr", dictionary[rs]]
+
     if(dictionary[funct] == 'move'):
         return [dictionary[funct],dictionary[rd] ,dictionary[rt]]
     
@@ -84,6 +118,12 @@ def iTypeDecoder(machineCode):
 
     if(dictionary[opcode] == 'sw' or dictionary[opcode] == 'lw'):
         return [dictionary[opcode],dictionary[rt], binaryToDecimal(immediate), dictionary[rs]]
+    
+    elif(dictionary[opcode] == "slti" or dictionary[opcode] == "addi" or dictionary[opcode] == "addiu" ):
+        return [dictionary[opcode],dictionary[rt], dictionary[rs], binaryToDecimal(immediate)]
+    
+    elif(dictionary[opcode] == "mul"):
+        return [dictionary[opcode],dictionary[rs], dictionary[rt], dictionary[rt]]
     
     if(immediate[0] == "0"):
         return [dictionary[opcode],dictionary[rs], dictionary[rt], binaryToDecimal(immediate)]
@@ -103,7 +143,7 @@ def instructionDecoder(machineCode):
     if(machineCode[0:6] == '000000'):
         return rTypeDecoder(machineCode)
     
-    elif(machineCode[0:6] == '000010'):
+    elif(machineCode[0:6] == '000010' or machineCode[0:6] == '000010' or machineCode[0:6] == '000011') :
         return jTypeDecoder(machineCode)
     
     else:
@@ -164,17 +204,23 @@ for i in instructions:
 def identify_labels(InstructionHashmap):
     labels = {}
     loop_count = 0 # for naming the labels
+    loop_count_2 = 0 # for naming the la
 
     for i in InstructionHashmap:
+        loop_count_2 += 1
         if(InstructionHashmap[i][0] == 'beq' or InstructionHashmap[i][0] == 'bne'):
             loop_count += 1
             pc_key = int(i) + 4 + (4 * int(InstructionHashmap[i][3]))
-            labels[pc_key] = f"loop{loop_count}"
+            labels[str(pc_key)] = f"loop{loop_count}"
+            InstructionHashmap[i][3] = labels[str(pc_key)]
+            listOfInstructions[loop_count_2-1][3] = labels[str(pc_key)] 
 
-        elif(InstructionHashmap[i][0] == 'j'):
+        elif(InstructionHashmap[i][0] == 'j' or InstructionHashmap[i][0] == 'jal'):
             loop_count += 1
             pc_key = int(InstructionHashmap[i][1]) * 4
-            labels[pc_key] = f"loop{loop_count}"
+            labels[str(pc_key)] = f"loop{loop_count}"
+            InstructionHashmap[i][1] = labels[str(pc_key)]
+            listOfInstructions[loop_count_2-1][1] = labels[str(pc_key)]
     
     sorted_labels = dict(sorted(labels.items()))
     return sorted_labels
@@ -187,7 +233,6 @@ for i in label_dict:
     dave_list.append(temp)
 
 
-print(dave_list)
 
 
 
@@ -206,20 +251,6 @@ print(dave_list)
 
 
 
-
-
-
-
-# def getCodeFromLabel(label):
-#     instructions = []
-#     res = list(labels.keys()).index(label)
-#     ind_ll = list(labels)[res]
-#     ind_ul = list(labels)[res+1]
-
-#     for i in range(labels[ind_ll], labels[ind_ul] ,4):
-#         instructions.append(listOfInstructions[i//4])
-
-#     return instructions
 
 
 
