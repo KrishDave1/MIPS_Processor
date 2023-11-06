@@ -234,10 +234,11 @@ def identify_labels(InstructionHashmap):
                 labels[str(pc_key)] = f"loop{loop_count}"
                 InstructionHashmap[i][1] = labels[str(pc_key)]
                 listOfInstructions[loop_count_2-1][1] = labels[str(pc_key)]
+                
             elif(str(pc_key) in labels.keys()):
                 InstructionHashmap[i][1] = labels[str(pc_key)]
                 listOfInstructions[loop_count_2-1][1] = labels[str(pc_key)]
-
+                
             else:
                 continue    
     
