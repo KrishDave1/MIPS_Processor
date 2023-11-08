@@ -93,7 +93,6 @@ def twos_comp(bin): # Function prints the one's and two's complement of binary n
 
     return twos # Return the 2's complement
 
-
 def rTypeDecoder(machineCode):
     rs = machineCode[6:11]
     rt = machineCode[11:16]
@@ -108,7 +107,6 @@ def rTypeDecoder(machineCode):
         return [dictionary[funct],dictionary[rd] ,dictionary[rt]]
     
     return [dictionary[funct],dictionary[rd] ,dictionary[rs] , dictionary[rt]]
-
 
 def iTypeDecoder(machineCode):
     opcode = machineCode[0:6]
@@ -149,64 +147,29 @@ def instructionDecoder(machineCode):
     else:
         return iTypeDecoder(machineCode)
 
-
-# Sorting
-# instructions = [
-# "00000000000000001001000000100001",
-# "00000000000010111011000000100001",
-# "00000000000010101000100000100001",
-# "00000001001100100000100000101010",
-# "00010100001000000000000000011100",
-# "00100010010100100000000000000001",
-# "00000000000101100101100000100001",
-# "00000000000100010101000000100001",
-# "00000000000000001001100000100001",
-# "00000000000000001010000000100001",
-# "00100010011100110000000000000001",
-# "00000001001100101100000000100010",
-# "00000011000100110000100000101010",
-# "00010100001000001111111111110101",
-# "10001101010011000000000000000000",
-# "10001101010011010000000000000100",
-# "00000001101011000000100000101010",
-# "00010000001000000000000000001010",
-# "00000000000011001010000000100001",
-# "00000000000011010110000000100001",
-# "00000000000101000110100000100001",
-# "10101101011011000000000000000000",
-# "10101101011011010000000000000100",
-# "10101101010011000000000000000000",
-# "10101101010011010000000000000100",
-# "00100001011010110000000000000100",
-# "00100001010010100000000000000100",
-# "00001000000100000000000000011101",
-# "10101101011011000000000000000000",
-# "10101101011011010000000000000100",
-# "00100001010010100000000000000100",
-# "00100001011010110000000000000100",
-# "00001000000100000000000000011101",
-# "00000000000101100101100000100001"
-# ]
-# pc = 4194380;
+pc = 4194380
 
 #Fibonacci
-instructions = [
-'00100000000010010000000000000101', # The last 4 digits are the input for the fibonacci function
-'00100000000010100000000000000000',
-'00100000000010110000000000000001',
-'00100000000100010000000000000000',
-'00000001010010110110000000100000',
-'00100001011010100000000000000000',
-'00100001100010110000000000000000',
-'00100010001100010000000000000001',
-'00010110001010011111111111111011'
-]
-pc = 4194304 # For fibonacci
+#f(0) = 1, f(1) = 1
+# The last 5 digits of the first line are the input for the fibonacci function
 listOfInstructions = []
 InstructionHashmap = {} # Key: PC, Value:
-dave_list = []
+dave_list = [] # loop names , Pc address
 
-for i in instructions:
+#Read input from file
+def Fetch_Phase(file_path):
+    input_data = []
+    with open(file_path, 'r') as file:
+        input_data = file.read()
+        input_data = input_data.split()
+        for i in range(len(input_data)):
+            input_data[i] = input_data[i].strip()
+    return input_data
+
+file_path = "Fibonacci.txt"  # Replace with the actual file path
+input_data = Fetch_Phase(file_path)
+
+for i in input_data:
     clock_cycle += 1
     listOfInstructions.append(instructionDecoder(i))
     InstructionHashmap[pc] = instructionDecoder(i)
@@ -234,11 +197,10 @@ def identify_labels(InstructionHashmap):
                 labels[str(pc_key)] = f"loop{loop_count}"
                 InstructionHashmap[i][1] = labels[str(pc_key)]
                 listOfInstructions[loop_count_2-1][1] = labels[str(pc_key)]
-                
             elif(str(pc_key) in labels.keys()):
                 InstructionHashmap[i][1] = labels[str(pc_key)]
                 listOfInstructions[loop_count_2-1][1] = labels[str(pc_key)]
-                
+
             else:
                 continue    
     
@@ -246,7 +208,6 @@ def identify_labels(InstructionHashmap):
     return sorted_labels
 
 label_dict = identify_labels(InstructionHashmap)
-
 
 for i in label_dict:
     temp = [label_dict[i], [i]]
