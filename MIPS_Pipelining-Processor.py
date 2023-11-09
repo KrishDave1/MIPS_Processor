@@ -333,14 +333,21 @@ def WriteBack_Phase():
     for i in range(len(Register_Array)):
         Final_Register_Array[i][1] = Register_Array[i][1] 
 
+def Fetch_Call(PC_address):
+    Instruction_Hashmap[PC_address] = Instruction_Memory[(PC_address - 4194380)//4]
+
 Instruction_Memory = Fetch_Phase("../Bubble_Sorting.txt")
+End_PC_address = 4194516
 # Instruction_Memory = Fetch_Phase("../Fibonacci.txt")
+# End_PC_address = 4194416
+
 Instruction_Hashmap = {}
 PC_address = 4194380
+
 Temp_PC_address = PC_address
-# while PC_address < len(Instruction_Memory)*4 + Temp_PC_address:
-while PC_address < 4194516:
-    Instruction_Hashmap[PC_address] = Instruction_Memory[(PC_address - 4194380)//4]
+while PC_address < End_PC_address:
+    # Instruction_Hashmap[PC_address] = Instruction_Memory[(PC_address - 4194380)//4]
+    Fetch_Call(PC_address)
     Decode_Phase(Instruction_Hashmap[PC_address],PC_address)
     List = Execute_Phase(InstructionHashmap[PC_address],PC_address)
     PC_address = int(List[0])
