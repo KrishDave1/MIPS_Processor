@@ -251,10 +251,10 @@ def Execute_Phase(instruction,PC_address):
                 break
         for i in range(len(Register_Array)):
             if Register_Array[i][0] == instruction[3]:
-                Temp_memory_value = (Register_Array[i][1] + int(instruction[2]))//4
+                mem_address = (Register_Array[i][1] + int(instruction[2]))//4
+                return [PC_address,mem_address,temp_index,instruction[0]]
                 # Register_Array[temp_index][1] = Main_memory[(Register_Array[i][1] + int(instruction[2]))//4]
-                Memory_Phase(Temp_memory_value,temp_index,instruction[0])
-                break
+                # Memory_Phase(mem_address,temp_index,instruction[0])
     elif instruction[0] == 'sw':
         PC_address += 4
         temp_index = 0
@@ -264,10 +264,9 @@ def Execute_Phase(instruction,PC_address):
                 break
         for i in range(len(Register_Array)):
             if Register_Array[i][0] == instruction[3]:
-                new = (Register_Array[i][1] + int(instruction[2]))//4
-                # Main_memory[new] = Register_Array[temp_index][1]
-                Memory_Phase(new,temp_index,instruction[0])
-                break
+                mem_address = (Register_Array[i][1] + int(instruction[2]))//4
+                return [PC_address,mem_address,temp_index,instruction[0]]
+                # Memory_Phase(new,temp_index,instruction[0])
     elif instruction[0] == 'slt':
         PC_address += 4
         temp_index = 0
@@ -306,7 +305,6 @@ def Execute_Phase(instruction,PC_address):
             if Register_Array[i][0] == instruction[2]:
                 temp_index_1 = i
         if Register_Array[temp_index][1] == Register_Array[temp_index_1][1]:
-            # PC_address = Jumpinstructions(instruction[3], PC_list)
             New_PC_address = PC_address + 4 + 4*int(instruction[3])
             PC_address = New_PC_address
         else:
@@ -316,7 +314,7 @@ def Execute_Phase(instruction,PC_address):
         PC_address = New_PC_address
     else:
         print("Wrong instruction")
-    return PC_address
+    return [PC_address,0,0,'']
 
 def Memory_Phase(Memory_value,index,instructionType):
     if instructionType == 'lw':
@@ -335,17 +333,18 @@ def WriteBack_Phase():
     for i in range(len(Register_Array)):
         Final_Register_Array[i][1] = Register_Array[i][1] 
 
-# Instruction_Memory = Fetch_Phase("../Bubble_Sorting.txt")
-Instruction_Memory = Fetch_Phase("../Fibonacci.txt")
+Instruction_Memory = Fetch_Phase("../Bubble_Sorting.txt")
+# Instruction_Memory = Fetch_Phase("../Fibonacci.txt")
 Instruction_Hashmap = {}
-for i in range(len(Instruction_Memory)):
-    Instruction_Hashmap[i*4 + 4194380] = Instruction_Memory[i]
-
 PC_address = 4194380
 Temp_PC_address = PC_address
-while PC_address < len(Instruction_Hashmap)*4 + Temp_PC_address:
+# while PC_address < len(Instruction_Memory)*4 + Temp_PC_address:
+while PC_address < 4194516:
+    Instruction_Hashmap[PC_address] = Instruction_Memory[(PC_address - 4194380)//4]
     Decode_Phase(Instruction_Hashmap[PC_address],PC_address)
-    PC_address = Execute_Phase(InstructionHashmap[PC_address],PC_address)
+    List = Execute_Phase(InstructionHashmap[PC_address],PC_address)
+    PC_address = int(List[0])
+    Memory_Phase(List[1],List[2],List[3])
     WriteBack_Phase()
-# print(Main_memory)
-print('Fibonacci value is ' + str(Final_Register_Array[10][1]))
+print(Main_memory)
+# print('Fibonacci value is ' + str(Final_Register_Array[10][1]))
