@@ -184,9 +184,9 @@ Clock_cycles = 0
 
 #For Sorting uncomment this
 # while PC_address < Temp_PC_address + 4*(len(InstructionHashmap)):
-    # Clock_cycles += 1
-    # PC_address = Execute_Phase(InstructionHashmap[PC_address],PC_list,PC_address)
-    # WriteBack_Phase()
+#     Clock_cycles += 1
+#     PC_address = Execute_Phase(InstructionHashmap[PC_address],PC_list,PC_address)
+#     WriteBack_Phase()
 # print('Total Clock cycles:' + " " + str(Clock_cycles))
 # print(Main_memory)
 
@@ -194,6 +194,7 @@ Clock_cycles = 0
 while PC_address < (Temp_PC_address + 4*(len(InstructionHashmap))):
     Clock_cycles += 1
     PC_address = Execute_Phase(InstructionHashmap[PC_address],PC_list,PC_address)
+    WriteBack_Phase()
 print("Total Clock Cycles:" + " " + str(Clock_cycles))
 print('The answer of fibonacci is:' + " " + str(Register_Array[10][1])) # The answer of fibonacci is stored in t4.v
 
